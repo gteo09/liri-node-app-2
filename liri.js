@@ -1,84 +1,163 @@
+//Environment Variables
+
 require("dotenv").config();
+
+var axios = require("axios");
 
 var keys = require("./keys.js");
 
-var spotify = new Spotify(keys.spotify);
-
-console.log(spotify);
-
-// Make it so liri.js can take in one of the following commands:
-
-//    * `concert-this`
-
-//    * `spotify-this-song`
-
-//    * `movie-this`
-
-//    * `do-what-it-says
-
-// 3. `node liri.js movie-this '<movie name here>'`
-
-//    * This will output the following information to your terminal/bash window:
-
-//      ```
-//        * Title of the movie.
-//        * Year the movie came out.
-//        * IMDB Rating of the movie.
-//        * Rotten Tomatoes Rating of the movie.
-//        * Country where the movie was produced.
-//        * Language of the movie.
-//        * Plot of the movie.
-//        * Actors in the movie.
-//      ```
-
-//    * If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
-
-//      * If you haven't watched "Mr. Nobody," then you should: <http://www.imdb.com/title/tt0485947/>
-
-//      * It's on Netflix!
-// * You'll use the `axios` package to retrieve data from the OMDB API. Like all of the in-class activities, the OMDB API requires an API key. You may use `trilogy`.
-
-var movieName = process.argv[2];
-
-// Then run a request with axios to the OMDB API with the movie specified
-var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=8d5b3bbe";
-
-// This line is just to help us debug against the actual URL.
-console.log(queryUrl);
-
-axios.get(queryUrl).then(
-  function(response) {
-    console.log("Release Year: " + response.data.Year);
-  }
-);
-
-// 4. `node liri.js do-what-it-says`
-
-//    * Using the `fs` Node package, LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.
-
-//      * It should run `spotify-this-song` for "I Want it That Way," as follows the text in `random.txt`.
-
-//      * Edit the text in random.txt to test out the feature for movie-this and concert-this.
-
 var fs = require("fs");
 
-// This block of code will read from the "movies.txt" file.
-// It's important to include the "utf8" parameter or the code will provide stream data (garbage)
-// The code will store the contents of the reading inside the variable "data"
-fs.readFile("movies.txt", "utf8", function(error, data) {
+var Spotify = require('node-spotify-api');
 
-  // If the code experiences any errors it will log the error to the console.
-  if (error) {
-    return console.log(error);
+var spotify = new Spotify(keys.spotify);
+
+
+//Input Variables
+var command = process.argv[2]; // takes input from console, decides which API will run
+
+var search  = (process.argv[3]); // search to put in to API
+ 
+
+// If statements, determine which API to run based on which command/search was input
+
+// if command = concert-this run bandsintown API
+if(command==="concert-this"){
+
+
+  var queryUrl = "https://rest.bandsintown.com/artists/"+search+"/events?app_id=83408045d4e88b783aac51e14feab609&date=upcoming";
+
+  axios.get(queryUrl).then(function(response){
+
+    var venueArr = response.data;
+
+    for(var i=0; i<venueArr.length; i++){
+
+      console.log("Venue name: "+venueArr[i].venue.name+
+      "\nLocation: "+venueArr[i].venue.city+", "+venueArr[i].venue.country+
+      "\nDate of Event: "+venueArr[i].datetime)
+      console.log("\n\n")
+
+    }
+
+  });
+
+}
+
+
+// if command = spotify-this-song run spotify API
+if(command==="spotify-this-song"){
+  
+  spotify
+    .search({ type: 'track', query: search })
+    .then(function(response) {
+
+
+      console.log(response.tracks.items[0].artists[2].name)
+
+      //  for(var i=0;i<response.tracks.items.length; i++){   
+      //     //   Artist(s)
+
+      //     console.log(response.tracks.items[i].artists[i].name)
+
+      //     //  * The song's name
+
+
+
+      //     //  * A preview link of the song from Spotify
+      //     console.log(response.tracks.items[i].external_urls.spotify)
+
+      //     //  * The album that the song is from
+      //     console.log(response.tracks.items[i].album.name);
+      //     console.log("\n")
+        
+      // }
+
+    }).catch(function(err) {
+      console.log(err);
+    });
   }
 
-  // We will then print the contents of data
-  console.log(data);
+//if command = movie-this run OMDb API
+if(command==="movie-this"){
 
-  // Then split it by commas (to make it more readable)
-  var dataArr = data.split(",");
+  if(!search){
 
-  // We will then re-display the content as an array for later use.
-  console.log(dataArr);
+    search = "Mr. Nobody"
 
-});
+    var queryUrl = "http://www.omdbapi.com/?t=" + search + "&y=&plot=short&apikey=8d5b3bbe";
+
+    axios.get(queryUrl).then(function(response){
+
+      console.log("Title: "+ response.data.Title+
+      "\nRelease Year: "+ response.data.Year+
+      "\nIMDB Rating: "+response.data.imdbRating+
+      "\nRotten Tomatoes Rating: "+response.data.Ratings[1].Value+
+      "\nCountry: "+response.data.Country+
+      "\nLanguage: "+response.data.Language+
+      "\nPlot: "+response.data.Plot+
+      "\nActors: "+response.data.Actors)
+    });
+      
+
+  }
+  
+  var queryUrl = "http://www.omdbapi.com/?t=" + search + "&y=&plot=short&apikey=8d5b3bbe";
+
+  axios.get(queryUrl).then(function(response){
+
+    console.log("Title: "+ response.data.Title+
+    "\nRelease Year: "+ response.data.Year+
+    "\nIMDB Rating: "+response.data.imdbRating+
+    "\nRotten Tomatoes Rating: "+response.data.Ratings[1].Value+
+    "\nCountry: "+response.data.Country+
+    "\nLanguage: "+response.data.Language+
+    "\nPlot: "+response.data.Plot+
+    "\nActors: "+response.data.Actors)
+  });
+
+}
+  
+//if command = do-what-it-says pull info from random txt file and run default spotify API call
+//default API call if user input is undefined
+
+if(command==="do-what-it-says"){
+
+  fs.readFile("random.txt", "utf8", function(error, data){
+    if(error){
+      return console.log(error)
+    }
+    console.log(data);
+    
+    var randomArray=data.split("/n")
+
+    console.log(randomArray);
+  })
+  
+}
+
+////FS EXAMPLE//////
+
+// var fs = require("fs");
+
+// // This block of code will read from the "movies.txt" file.
+// // It's important to include the "utf8" parameter or the code will provide stream data (garbage)
+// // The code will store the contents of the reading inside the variable "data"
+
+// fs.readFile("movies.txt", "utf8", function(error, data) {
+
+//   // If the code experiences any errors it will log the error to the console.
+//   if (error) {
+//     return console.log(error);
+//   }
+
+//   // We will then print the contents of data
+//   console.log(data);
+
+//   // Then split it by commas (to make it more readable)
+//   var dataArr = data.split(",");
+
+//   // We will then re-display the content as an array for later use.
+//   console.log(dataArr);
+
+// });
