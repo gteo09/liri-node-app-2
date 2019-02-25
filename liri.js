@@ -16,7 +16,7 @@ var spotify = new Spotify(keys.spotify);
 //Input Variables
 var command = process.argv[2]; // takes input from console, decides which API will run
 
-var search  = (process.argv[3]); // search to put in to API
+var search  = process.argv[3]; // search to put in to API
  
 
 // If statements, determine which API to run based on which command/search was input
@@ -127,37 +127,34 @@ if(command==="do-what-it-says"){
     if(error){
       return console.log(error)
     }
-    console.log(data);
-    
-    var randomArray=data.split("/n")
 
-    console.log(randomArray);
+    var randomArray=data.split(",")
+
+    search = randomArray[1];
+
+    spotify
+    .search({ type: 'track', query: search })
+    .then(function(response){
+      console.log(response);
+
+      //  for(var i=0;i<response.tracks.items.length; i++){   
+      //     //   Artist(s)
+
+      //     console.log(response.tracks.items[i].artists[i].name)
+
+      //     //  * The song's name
+
+
+
+      //     //  * A preview link of the song from Spotify
+      //     console.log(response.tracks.items[i].external_urls.spotify)
+
+      //     //  * The album that the song is from
+      //     console.log(response.tracks.items[i].album.name);
+      //     console.log("\n")
+        
+      // }
+    })
   })
-  
 }
 
-////FS EXAMPLE//////
-
-// var fs = require("fs");
-
-// // This block of code will read from the "movies.txt" file.
-// // It's important to include the "utf8" parameter or the code will provide stream data (garbage)
-// // The code will store the contents of the reading inside the variable "data"
-
-// fs.readFile("movies.txt", "utf8", function(error, data) {
-
-//   // If the code experiences any errors it will log the error to the console.
-//   if (error) {
-//     return console.log(error);
-//   }
-
-//   // We will then print the contents of data
-//   console.log(data);
-
-//   // Then split it by commas (to make it more readable)
-//   var dataArr = data.split(",");
-
-//   // We will then re-display the content as an array for later use.
-//   console.log(dataArr);
-
-// });
