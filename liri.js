@@ -105,7 +105,7 @@ if(command==="movie-this"){
       "\nActors: "+response.data.Actors)
     });
       
-}
+}else{
   
   var queryUrl = "http://www.omdbapi.com/?t=" + search + "&y=&plot=short&apikey=8d5b3bbe";
 
@@ -120,10 +120,10 @@ if(command==="movie-this"){
     "\nPlot: "+response.data.Plot+
     "\nActors: "+response.data.Actors)
   });
-
+}
 }
   
-//if command = do-what-it-says pull info from random txt file and run default spotify API call
+//if command = do-what-it-says pull info from random txt file and runs spotify API call
 //default API call if user input is undefined
 
 if(command==="do-what-it-says"){
@@ -150,4 +150,3 @@ if(command==="do-what-it-says"){
     })
   })
 }
-
