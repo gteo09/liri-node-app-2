@@ -16,7 +16,7 @@ var spotify = new Spotify(keys.spotify);
 //Input Variables
 var command = process.argv[2]; // takes input from console, decides which API will run
 
-var search  = process.argv[3]; // search to put in to API
+var search  = process.argv.slice(3).join(" "); // search to put in to API
  
 
 // If statements, determine which API to run based on which command/search was input
@@ -33,7 +33,7 @@ if(command==="concert-this"){
 
     for(var i=0; i<venueArr.length; i++){
 
-      console.log("Venue name: "+venueArr[i].venue.name+
+      console.log("\nVenue name: "+venueArr[i].venue.name+
       "\nLocation: "+venueArr[i].venue.city+", "+venueArr[i].venue.country+
       "\nDate of Event: "+venueArr[i].datetime)
       console.log("\n\n")
@@ -47,36 +47,42 @@ if(command==="concert-this"){
 
 // if command = spotify-this-song run spotify API
 if(command==="spotify-this-song"){
-  
+
+//Default API call
+  if(!search){
+
+    search = "Ace of Base"
+    spotify
+    .search({ type: 'track', query: search, limit: 1 })
+    .then(function(response){
+
+      var artArr = response.tracks.items[0];
+
+      console.log("\nAlbum name: "+artArr.album.name+
+      "\nArtist(s): "+artArr.artists[0].name+
+      "\nPreview URL: "+artArr.preview_url)
+        
+    }).catch(function(err) {
+      console.log(err);
+    });
+
+  } else{
+
   spotify
-    .search({ type: 'track', query: search })
+    .search({ type: 'track', query: search, limit: 1 })
     .then(function(response) {
 
+      var someArr = response.tracks.items[0];
 
-      console.log(response.tracks.items[0].artists[2].name)
-
-      //  for(var i=0;i<response.tracks.items.length; i++){   
-      //     //   Artist(s)
-
-      //     console.log(response.tracks.items[i].artists[i].name)
-
-      //     //  * The song's name
-
-
-
-      //     //  * A preview link of the song from Spotify
-      //     console.log(response.tracks.items[i].external_urls.spotify)
-
-      //     //  * The album that the song is from
-      //     console.log(response.tracks.items[i].album.name);
-      //     console.log("\n")
-        
-      // }
+      console.log("\nAlbum name: "+someArr.album.name+
+      "\nArtist(s): "+someArr.artists[0].name+
+      "\nPreview URL: "+someArr.preview_url)
 
     }).catch(function(err) {
       console.log(err);
     });
   }
+}
 
 //if command = movie-this run OMDb API
 if(command==="movie-this"){
@@ -89,7 +95,7 @@ if(command==="movie-this"){
 
     axios.get(queryUrl).then(function(response){
 
-      console.log("Title: "+ response.data.Title+
+      console.log("\nTitle: "+ response.data.Title+
       "\nRelease Year: "+ response.data.Year+
       "\nIMDB Rating: "+response.data.imdbRating+
       "\nRotten Tomatoes Rating: "+response.data.Ratings[1].Value+
@@ -99,14 +105,13 @@ if(command==="movie-this"){
       "\nActors: "+response.data.Actors)
     });
       
-
-  }
+}
   
   var queryUrl = "http://www.omdbapi.com/?t=" + search + "&y=&plot=short&apikey=8d5b3bbe";
 
   axios.get(queryUrl).then(function(response){
 
-    console.log("Title: "+ response.data.Title+
+    console.log("\nTitle: "+ response.data.Title+
     "\nRelease Year: "+ response.data.Year+
     "\nIMDB Rating: "+response.data.imdbRating+
     "\nRotten Tomatoes Rating: "+response.data.Ratings[1].Value+
@@ -135,25 +140,13 @@ if(command==="do-what-it-says"){
     spotify
     .search({ type: 'track', query: search })
     .then(function(response){
-      console.log(response);
 
-      //  for(var i=0;i<response.tracks.items.length; i++){   
-      //     //   Artist(s)
+      var defArr = response.tracks.items[0];
 
-      //     console.log(response.tracks.items[i].artists[i].name)
-
-      //     //  * The song's name
-
-
-
-      //     //  * A preview link of the song from Spotify
-      //     console.log(response.tracks.items[i].external_urls.spotify)
-
-      //     //  * The album that the song is from
-      //     console.log(response.tracks.items[i].album.name);
-      //     console.log("\n")
-        
-      // }
+      console.log("\nAlbum name: "+defArr.album.name+
+      "\nArtist(s): "+defArr.artists[0].name+
+      "\nPreview URL: "+defArr.preview_url)
+      
     })
   })
 }
