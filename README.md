@@ -13,6 +13,6 @@ This command will take your input and initialize a Bandsintown API call to give 
 
 -"spotify-this-song": This command initializes a Spotify API call and returns artists, url's to the song, and album names. 
 
--"movie-this": This command returns information about the movie you entered.
+-"movie-this": This command returns information about the movie you entered using the OMDb API
 
 -"do-what-it-says": This command runs a Spotify API call for the song "I Want it That Way".
